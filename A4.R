@@ -38,6 +38,11 @@ plotUtilFunc(50,0,2,0.01,0.0001)
 
 # ------------- Exercise 2 -------------
 
+# this does not work.. 
+#[1] 1.125057e-24 2.891895e-23 1.667541e-21 4.939375e-19 8.119993e-15 4.659232e-25 5.142634e-24 6.885389e-23 1.623123e-21 4.939375e-19
+#[11] 2.523801e-24 1.934377e-22 9.508935e-20 8.120393e-15 8.120488e-15 4.476378e-24 6.884949e-23 1.623123e-21 9.358773e-20 3.570476e-16
+#[21] 3.112984e-25 1.259496e-23 1.684846e-21 3.212329e-18 4.557445e-13
+
 choiceList = rbind(c(48,48,40,64),c(40,64,32,80),c(32,80,24,96),c(24,96,16,112),c(16,112,8,120),c(48,48,42,66),c(42,66,36,84),c(36,84,30,102),c(30,102,24,120),c(24,120,16,128),c(48,48,38,62),c(38,62,28,76),c(28,76,18,90),c(18,90,8,104),c(8,104,0,112),c(42,42,36,60),c(36,60,30,78),c(30,78,24,96),c(24,96,18,114),c(18,114,10,122),c(54,54,44,68),c(44,68,34,82),c(34,82,24,96),c(24,96,14,110),c(14,110,6,118))
 
 firstChoice = cbind(choiceList[,1],choiceList[,2])
@@ -93,6 +98,10 @@ thetasAnswer
 identifiedRSets = cbind(append(0,thetasAnswer[-length(thetasAnswer)]),thetasAnswer)
 zeroIndices = seq(6,26,by=5)
 identifiedRSets[zeroindices[-length(zeroindices)],1] = 0
+# the case matters in R.
+#> identifiedRSets[zeroindices[-length(zeroindices)],1] = 0
+#Error in identifiedRSets[zeroindices[-length(zeroindices)], 1] = 0 : 
+#  object 'zeroindices' not found
 
 representativeR = 0.5*(identifiedRSets[,1]+identifiedRSets[,2])
 #identifiedRSets[zeroindices-1,2] = 100
@@ -162,6 +171,7 @@ vLogLikelihood = function(yVec,theta){
   #sigma = thetaandsigma[2]
   logLikelihood = NULL
   for(i in 1:nrow(choiceList)){
+    # this is obviously not correct.. You are using the density instead of the cdf.. 
     pr = dgumbel(VCombUtil(firstChoice[i,],theta)-VCombUtil(secondChoice[i,],theta))
   logLikelihood[i] = yVec[i]*log(1-pr)+(1-yVec[i])*log(pr)
   }
@@ -188,7 +198,7 @@ gridsearch(dat[900,],potentialThetas)
 
 
 # ------------- Exercise 4 -------------
-
+# very good 
 #1.
 bealeFunc = function(inputs){
   x = inputs[1]
@@ -293,6 +303,8 @@ RBOptiFun(c(0,0))
 #Answer: 0.974, 0.948
 
 # ------------- Exercise 6 -------------
+# this is classic case of a numerical problem
+# I would have liked to see more attempts to get parameters here
 
 library("AER")
 data("SmokeBan")
@@ -380,6 +392,7 @@ library("nloptr")
 thetaandsigma0 = c(2.1,0.8)
 isres(thetaandsigma0,vlikelihood,lower = c(0,0), upper = c(100,100), yVec=dat[5,])
 #Converges sucessfully to 99.71528 65.65006, with likelihood 12.5
+# why dont you set realistic ranges to start with???
 lbfgs(thetaandsigma0,vlikelihood, yVec=dat[5,])
 #Converges sucessfully to 5.532317 1.645633, with likelihood 12.5. Faster convergence with more realistic answers
 bobyqa(thetaandsigma0,vlikelihood, yVec=dat[5,])
