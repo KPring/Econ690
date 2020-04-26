@@ -219,16 +219,16 @@ simB = function(inputs, setIndividualsToTry = 1:nrow(dat)){
 #3.
 library("nloptr")
 
-betaAndSigma0 = c(rep(1,7), 20)
+betaAndSigma0 = c(c(-1000, 1, 1, 1.0017, 0.88377, 1.0382, 1), 5)
 obj = function(betaAndSigma, numIndividualsToTry = nrow(XMatrix)){
-  return(simB(betaAndSigma, numIndividualsToTry) - thetaData)
+  return(abs(simB(betaAndSigma, numIndividualsToTry) - thetaData))
 }
 lower = c(rep(-1000,7), 0)
 upper = c(rep(2000, 7), 2000)
 #Each iteration takes ~3.5 minutes when restricting to the first 125 individuals in the data
 #maxeval set to 20 to encourage this to complete
-param = nloptr(betaAndSigma0, eval_f=obj, lb=lower, ub=upper, opts=list("algorithm"="NLOPT_LN_BOBYQA","print_level"=2,"xtol_rel"=1.0e-10,"maxeval"=20), setIndividualsToTry = 1:125)
-
+optimiseResults = nloptr(betaAndSigma0, eval_f=obj, lb=lower, ub=upper, opts=list("algorithm"="NLOPT_LN_BOBYQA","print_level"=2,"xtol_rel"=1.0e-10,"maxeval"=20), setIndividualsToTry = 1:125)
+param = optimiseResults$solution
 
 #4.
 
@@ -237,7 +237,7 @@ samplePerRun = 20
 modelResults = matrix(nrow = numRuns, ncol = 8)
 for(run in 1:numRuns){
   BootstrapSet = runif(samplePerRun, 0, nrow(dat)) # Select random sample of individuals
-  modelResults[run,] = sdOfParams(param, BootstrapSet)
+  modelResults[run,] = simB(param, BootstrapSet)
 }
 for(run in 1:numRuns){
   for(j in 1:8){
