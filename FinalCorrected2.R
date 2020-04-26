@@ -155,7 +155,7 @@ names(thetaData)[8] = "sigma"
 
 #2.
 
-S = 10 #Simulation steps
+S = 5 #Simulation steps
 #Ideally this would be higher, but I've set it low to get the optimising function to work
 previouslyTriedB = matrix(nrow = 2, ncol = nrow(XMatrix) + 1)
 previouslyTriedB[1, 1] = 0
@@ -228,7 +228,7 @@ lower = c(rep(-1000,7), 0)
 upper = c(rep(2000, 7), 2000)
 #Each iteration takes ~3.5 minutes when restricting to the first 125 individuals in the data
 #maxeval set to 25 to encourage this to complete, might need to be reduced to ~20
-optimiseResults = nloptr(betaAndSigma0, eval_f=obj, lb=lower, ub=upper, opts=list("algorithm"="NLOPT_LN_BOBYQA","print_level"=2,"xtol_rel"=1.0e-10,"maxeval"=50), setIndividualsToTry = 1:nrow(dat))
+optimiseResults = nloptr(betaAndSigma0, eval_f=obj, lb=lower, ub=upper, opts=list("algorithm"="NLOPT_LN_BOBYQA","print_level"=2,"xtol_rel"=1.0e-10,"maxeval"=25), setIndividualsToTry = 1:nrow(dat))
 param = optimiseResults$solution
 
 #4.
